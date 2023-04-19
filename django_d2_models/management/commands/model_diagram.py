@@ -21,6 +21,16 @@ class Command(BaseCommand):
             help='Show referenced models, even if they are from excluded apps',
         )
         parser.add_argument(
+            '--abstract-models-depth',
+            type=int,
+            default=1,
+            help=(
+                'Show fields inherited from abstract model in separate model.'
+                'Value specifies how deep in inheritance tree this condition'
+                'will propagate.'
+            ),
+        )
+        parser.add_argument(
             '--exclude-apps',
             type=str,
             nargs='+',
@@ -31,7 +41,10 @@ class Command(BaseCommand):
         print(GraphRenderer().render_model_graph(graph))
 
     def _config_from_options(self, options: dict) -> ModelExportConfig:
-        args = ('user_apps_only', 'exclude_apps', 'show_ref')
+        args = (
+            'user_apps_only', 'exclude_apps', 'show_ref',
+            'abstract_models_depth',
+        )
         config_options = {}
         for arg in args:
             if arg in options and options[arg] is not None:
