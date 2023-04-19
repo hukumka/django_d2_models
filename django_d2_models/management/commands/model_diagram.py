@@ -15,6 +15,12 @@ class Command(BaseCommand):
             help='Determines if third-party app models are included.',
         )
         parser.add_argument(
+            '--show-ref',
+            type=bool,
+            default=True,
+            help='Show referenced models, even if they are from excluded apps',
+        )
+        parser.add_argument(
             '--exclude-apps',
             type=str,
             nargs='+',
@@ -25,10 +31,10 @@ class Command(BaseCommand):
         print(GraphRenderer().render_model_graph(graph))
 
     def _config_from_options(self, options: dict) -> ModelExportConfig:
-        args = ('user_apps_only', 'exclude_apps')
+        args = ('user_apps_only', 'exclude_apps', 'show_ref')
         config_options = {}
         for arg in args:
-            if arg in options:
+            if arg in options and options[arg] is not None:
                 config_options[arg] = options[arg]
 
         return ModelExportConfig(**config_options)

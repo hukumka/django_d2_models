@@ -9,7 +9,9 @@ from typing import Type, Optional
 from enum import Enum
 
 from django.db.models import Model
-from django.db.models.fields.related import RelatedField, ForeignKey, ManyToManyField, OneToOneField
+from django.db.models.fields.related import (
+    RelatedField, ForeignKey, ManyToManyField, OneToOneField,
+)
 from django.apps import apps
 
 
@@ -22,7 +24,9 @@ class RelationKind(Enum):
 @dataclass(frozen=True)
 class Relation:
     source_model: str
-    target: str
+    source_field: str
+    target_model: str
+    target_field: str
     kind: RelationKind
     allow_null: bool
 
@@ -43,6 +47,10 @@ class ModelExportConfig:
     exclude_apps: list[str] = field(default_factory=list)
     """
     Specify list of application names that will be excluded from diagram.
+    """
+    show_ref: bool = True
+    """
+    Show references even if referenced model is excluded from rendering
     """
 
 
@@ -87,7 +95,7 @@ class GraphModelBuilder:
     ) -> Optional[Relation]:
         to = field.related_model
         related = models.get(to._meta.label)
-        if related is None:
+        if related is None and not self._config.show_ref:
             return
 
         kind_map: dict[Type[RelatedField], RelationKind] = {
@@ -100,7 +108,14 @@ class GraphModelBuilder:
         if kind is None:
             return
 
-        return Relation(model._meta.label, related._meta.label, kind, field.null)
+        return Relation(
+            source_model=model._meta.label,
+            source_field=field.name,
+            target_model=to._meta.label,
+            target_field='id',
+            kind=kind,
+            allow_null=field.null,
+        )
 
     def should_export_model(self, model: Type[Model]) -> bool:
         return not model._meta.abstract
