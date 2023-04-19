@@ -3,3 +3,5 @@ __pycache__/
 django_d2_models.egg-info
 db.sqlite3
 .DS_Store
+*.d2
+*.svg
