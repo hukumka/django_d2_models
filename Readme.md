@@ -39,7 +39,7 @@ d2 models.d2
 
 ### exclude-apps
 
-`--exclude-apps users --exclude-apps payment --exclude-apps feedback`
+`--exclude-apps users payment feedback`
 
 Exclude particular applications from rendering to declutter diagram
 
