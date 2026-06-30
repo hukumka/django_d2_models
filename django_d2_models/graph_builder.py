@@ -123,7 +123,10 @@ class GraphModelBuilder:
         to = field.related_model
         # Django does not resolve related fields in abstract models
         if isinstance(to, str):
-            to = apps.get_model(to)
+            if to == 'self':
+                to = model
+            else:
+                to = apps.get_model(to)
 
         related = models.get(to._meta.label)
         if related is None and not self._config.show_ref:
